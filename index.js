@@ -3,6 +3,7 @@ const keep_alive = require('./keep_alive.js');
 
 const client = new Discord.Client();
 let intervalId;
+let reminderInterval = 1800000; // Standaard interval van 30 minuten
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
@@ -19,8 +20,22 @@ client.on('message', msg => {
   if (msg.channel.name === 'bing') {
     const content = msg.content.toLowerCase();
     
+    // Start sending messages with specified interval if message starts with "elke"
+    if (content.startsWith('elke ')) {
+      const milliseconds = parseInt(content.split(' ')[1]);
+      if (!isNaN(milliseconds) && milliseconds > 0) {
+        reminderInterval = milliseconds;
+        msg.channel.send(`Interval voor herinnering is veranderd naar ${milliseconds} milliseconden.`);
+        if (intervalId) {
+          clearInterval(intervalId);
+          startReminder(msg.channel);
+        }
+      } else {
+        msg.channel.send('Ongeldige invoer. Gebruik: elke (milliseconden)');
+      }
+    } 
     // Start sending messages every 10 seconds if message is "start"
-    if (content === 'start') {
+    else if (content === 'start') {
       startReminder(msg.channel);
     } 
     // Stop sending messages if message is "stop"
@@ -35,10 +50,10 @@ client.login(process.env.TOKEN);
 function startReminder(channel) {
   if (!intervalId) {
     intervalId = setInterval(() => {
-      channel.send('Dit is een herinnering!');
-    }, 10000);
+      channel.send('ZAZAZAZAZAZAZAZAZAZAZAZAZAZAZAZA');
+    }, reminderInterval);
   } else {
-    channel.send('Herinnering is al gestart!');
+    channel.send('GOD GOD GOOD GOD GOD');
   }
 }
 
@@ -46,9 +61,9 @@ function stopReminder(channel) {
   if (intervalId) {
     clearInterval(intervalId);
     intervalId = null;
-    channel.send('Herinnering gestopt.');
+    channel.send('gestopt voor u');
   } else {
-    channel.send('Herinnering is al gestopt!');
+    channel.send('al gestopt 👌👍');
   }
 }
 
